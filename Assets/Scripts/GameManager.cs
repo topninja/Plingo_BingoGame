@@ -1,15 +1,15 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-
-[ExecuteInEditMode]
-[RequireComponent(typeof(UnityEngine.UI.GridLayoutGroup))]
+[RequireComponent(typeof(AudioSource))]
 public class GameManager : MonoBehaviour
-{
+{	
+	public AudioSource fxSound;
+
 	public GameObject CardPanel;
 
 	//cards prefab
@@ -48,6 +48,23 @@ public class GameManager : MonoBehaviour
 	private int ballleftCount = 96;
 	private List<int> selectedCards;
 	private bool loadingState;
+
+	//start dialog
+	public GameObject StartDlg_NameinputLayout;
+
+	public GameObject StartDlg_PlayerCountDropDownbox;
+	public GameObject inputplayerPerfab;
+	public List<GamePlayer> players;
+
+	public GameObject StartDlg;
+
+	public GameObject CardsPanel;
+	public GameObject PlayerCardsLayout;
+	public GameObject PlayerCardPanelPrefab;
+
+	public GameObject OnePlayerCardsPanel;
+
+
 
     // Start is called before the first frame update
 
@@ -156,6 +173,58 @@ public class GameManager : MonoBehaviour
 		{
 			GameObject.DestroyImmediate(ballPosition.transform.GetChild(i).gameObject);
 		}
+
+		int childs_cnt = StartDlg_NameinputLayout.transform.childCount;
+		for (int i = childs_cnt - 1; i >= 0; i--)
+		{
+			GameObject.DestroyImmediate(StartDlg_NameinputLayout.transform.GetChild(i).gameObject);
+		}
+		players = new List<GamePlayer>();
+		for (var i = 0; i < 2; i ++){
+			GamePlayer player = new GamePlayer();
+
+			GameObject inputplayerObj = Instantiate(inputplayerPerfab) as GameObject;
+     		
+     		InputField InputField = inputplayerObj.transform.Find("InputField").GetComponent<InputField>();
+     		string PlayerName = "Player" + ( i + 1 ).ToString();;
+     		InputField.text = PlayerName;
+			InputField.onEndEdit.AddListener(delegate {NameInputChangedHandler(); });
+     		player.name = PlayerName;
+			player.index = i;
+			player.cardsArray = RandomCardsNumGet();
+     		players.Add(player);
+
+     		Transform playerNum = inputplayerObj.transform.Find("Num");
+     		Text num = playerNum.gameObject.GetComponent<Text>();
+     		num.text = ( i + 1 ).ToString();
+
+			inputplayerObj.transform.SetParent(StartDlg_NameinputLayout.transform, false);
+		}
+
+		StartDlg.SetActive(true);
+		int playercardslayoutChildcount = PlayerCardsLayout.transform.childCount;
+		for (int i = playercardslayoutChildcount - 1; i >= 0; i--)
+		{
+			GameObject.DestroyImmediate(PlayerCardsLayout.transform.GetChild(i).gameObject);
+		}
+		for (int i = 0; i < players.Count; i++){
+			GameObject playercardPrefab = Instantiate(PlayerCardPanelPrefab) as GameObject;
+			playercardPrefab.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = (i + 1).ToString();
+			playercardPrefab.transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].name;
+			for (int j = 1; j < 7; j++){
+				for (int k = 0; k < 6; k++){
+					playercardPrefab.transform.Find("Cards").transform.GetChild(j).transform.GetChild(k).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].cardsArray[( j - 1 ) * 6 + k ].ToString();
+					// Debug.Log(players[i].cardsArray[( j - 1 ) * 6 + k ].ToString());
+				}
+				
+			}
+			Button btn = playercardPrefab.gameObject.GetComponent<Button>();
+			btn.onClick.AddListener(() => {cardsPanelButtonClickHandler(playercardPrefab.gameObject); });
+			
+			playercardPrefab.transform.SetParent(PlayerCardsLayout.transform, false);
+		}
+
+
     }
 
     // Update is called once per frame
@@ -164,7 +233,7 @@ public class GameManager : MonoBehaviour
         if (!loadingState && Input.GetKeyUp(KeyCode.Space))
 	    {
     		loadingState = true;
-    		Debug.Log(ballleftCount);
+    		// Debug.Log(ballleftCount);
     		if (ballleftCount == 0){
     			initGameConfig();
     			return;
@@ -271,7 +340,21 @@ public class GameManager : MonoBehaviour
 
      		ballscalled.gameObject.GetComponent<Text>().text = (96 - ballleftCount).ToString();
      		ballsleft.gameObject.GetComponent<Text>().text = ballleftCount.ToString();
-     		loadingState = false;
+     		
+			//player cards panel update 
+			for (int i = 0; i < players.Count; i++){
+				for (var j = 0; j < players[i].cardsArray.Count; j++){
+					if (players[i].cardsArray[j] == RandomCardIndex){
+						int row = j / 6 + 1;
+						int col = j % 6 ;
+						Image image1 =  PlayerCardsLayout.transform.GetChild(i).transform.Find("Cards").transform.GetChild(row).transform.GetChild(col).transform.Find("bg").gameObject.GetComponent<Image>();
+						image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
+					}
+				}
+			} 
+			AudioSource effectmusic = GetComponent<AudioSource>();
+			effectmusic.Play(0);
+			loadingState = false;
 	    }
     }
 
@@ -294,6 +377,124 @@ public class GameManager : MonoBehaviour
 
 	public void settingCancelClick(){
 		settingDlg.SetActive(false);
+	}
+
+	public void startDlg_PlayerCountChanged(){
+		var count = StartDlg_PlayerCountDropDownbox.gameObject.GetComponent<Dropdown>().value + 2;
+		//inputplayerPerfab
+		int childs = StartDlg_NameinputLayout.transform.childCount;
+		for (int i = childs - 1; i >= count; i--)
+		{
+			GameObject.DestroyImmediate(StartDlg_NameinputLayout.transform.GetChild(i).gameObject);
+		}
+		int currentCount = StartDlg_NameinputLayout.transform.childCount;
+		for (int i = currentCount; i < count; i ++){
+			GameObject inputplayerObj = Instantiate(inputplayerPerfab) as GameObject;
+     		
+     		InputField InputField = inputplayerObj.transform.Find("InputField").GetComponent<InputField>();
+     		InputField.text = "Player" + ( i + 1 ).ToString();
+			InputField.onEndEdit.AddListener(delegate {NameInputChangedHandler(); });
+     		Transform playerNum = inputplayerObj.transform.Find("Num");
+     		Text num = playerNum.gameObject.GetComponent<Text>();
+     		num.text = ( i + 1 ).ToString();
+     		
+			inputplayerObj.transform.SetParent(StartDlg_NameinputLayout.transform, false);
+		}
+		players = new List<GamePlayer>();
+		for (int i = 0; i < count; i++){
+			GamePlayer player = new GamePlayer();
+			player.name = StartDlg_NameinputLayout.transform.GetChild(i).transform.Find("InputField").gameObject.GetComponent<InputField>().text;
+			player.cardsArray = RandomCardsNumGet();
+			player.index = i;
+			players.Add(player);
+		}
+
+		int playercardslayoutChildcount = PlayerCardsLayout.transform.childCount;
+		for (int i = playercardslayoutChildcount - 1; i >= 0; i--)
+		{
+			GameObject.DestroyImmediate(PlayerCardsLayout.transform.GetChild(i).gameObject);
+		}
+		for (int i = 0; i < players.Count; i++){
+			GameObject playercardPrefab = Instantiate(PlayerCardPanelPrefab) as GameObject;
+			playercardPrefab.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = (i + 1).ToString();
+			playercardPrefab.transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].name;
+			for (int j = 1; j < 7; j++){
+				for (int k = 0; k < 6; k++){
+					playercardPrefab.transform.Find("Cards").transform.GetChild(j).transform.GetChild(k).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].cardsArray[( j - 1 ) * 6 + k ].ToString();
+					// Debug.Log(players[i].cardsArray[( j - 1 ) * 6 + k ].ToString());
+				}
+				
+			}
+			Button btn = playercardPrefab.gameObject.GetComponent<Button>();
+			btn.onClick.AddListener(() => {cardsPanelButtonClickHandler(playercardPrefab.gameObject); });
+			
+			playercardPrefab.transform.SetParent(PlayerCardsLayout.transform, false);
+		}
+	}
+
+	public void GameStartClickHandler()
+	{
+		// int childcount = StartDlg_NameinputLayout.transform.childCount;
+		// players = new List<GamePlayer>();
+		// for (int i = 0; i < childcount; i++){
+		// 	string playername = StartDlg_NameinputLayout.transform.GetChild(i).gameObject.transform.Find("InputField").GetComponent<InputField>().text;
+		// 	GamePlayer player = new GamePlayer();
+		// 	player.name = playername;
+		// 	player.cardsArray = RandomCardsNumGet();
+		// 	players.Add(player);
+		// }
+
+		StartDlg.SetActive(false);
+	}
+
+	private List<int> RandomCardsNumGet(){
+		int allcardscount = 96;
+		int allusercardscount = 36;
+		List<int> cards = new List<int>();
+		List<int> selcards = new List<int>();
+		for (int i = 1 ; i < allcardscount + 1; i++){
+			selcards.Add(i);
+		}
+		
+		
+		for (var i = 0; i < allusercardscount; i++){
+			int random_value = (int)Random.Range(0, allcardscount - 1);
+			allcardscount--;
+			cards.Add(selcards[random_value]);
+			selcards.RemoveAt(random_value);
+		}
+		return cards;
+	}
+
+	public void showCardsPanel(){
+		
+		for(int i = 0; i < players.Count; i++){
+
+		}
+		CardsPanel.SetActive(true);
+	}
+
+	public void cardsPanelButtonClickHandler(GameObject obj){
+		Debug.Log(obj.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text);
+		OnePlayerCardsPanel.SetActive(true);
+	}
+
+	public void cardsPanelButtonOKClickHandler(){
+		OnePlayerCardsPanel.SetActive(false);
+	}
+
+	public void hideCardsPanel(){
+		CardsPanel.SetActive(false);
+	}
+
+	public void NameInputChangedHandler(){
+		var count = StartDlg_NameinputLayout.transform.childCount;
+		for (int i = 0; i < count; i++){
+			players[i].name = StartDlg_NameinputLayout.transform.GetChild(i).transform.Find("InputField").gameObject.GetComponent<InputField>().text;
+		}
+		for (int i = 0 ; i < PlayerCardsLayout.transform.childCount; i++){
+			PlayerCardsLayout.transform.GetChild(i).transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].name;
+		}
 	}
 
 }
