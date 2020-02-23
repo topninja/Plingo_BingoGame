@@ -9,6 +9,15 @@ using UnityEngine.EventSystems;
 public class GameManager : MonoBehaviour
 {	
 	public AudioSource fxSound;
+	
+	//theme dropdown
+	public GameObject themedropdown; 
+
+	public GameObject bg_ocean;
+	public GameObject bg_mermaid;
+	public GameObject bg_pearl;
+	public GameObject bg_sea;
+
 
 	public GameObject CardPanel;
 
@@ -63,6 +72,7 @@ public class GameManager : MonoBehaviour
 	public GameObject PlayerCardPanelPrefab;
 
 	public GameObject OnePlayerCardsPanel;
+	public GameObject OnePlayerCardsLayout;
 
 
 
@@ -192,6 +202,7 @@ public class GameManager : MonoBehaviour
      		player.name = PlayerName;
 			player.index = i;
 			player.cardsArray = RandomCardsNumGet();
+			player.selectedCardsArray = new List<int>();
      		players.Add(player);
 
      		Transform playerNum = inputplayerObj.transform.Find("Num");
@@ -238,7 +249,8 @@ public class GameManager : MonoBehaviour
     			initGameConfig();
     			return;
     		}
-    		int random_value = (int)Random.Range(0, ballleftCount - 1);
+			System.Random rnd = new System.Random((int)System.DateTime.Now.Ticks);
+    		int random_value = rnd.Next(ballleftCount);
     		ballleftCount--;
     		int RandomCardIndex = selectedCards[random_value];
     		selectedCards.RemoveAt(random_value);
@@ -349,6 +361,7 @@ public class GameManager : MonoBehaviour
 						int col = j % 6 ;
 						Image image1 =  PlayerCardsLayout.transform.GetChild(i).transform.Find("Cards").transform.GetChild(row).transform.GetChild(col).transform.Find("bg").gameObject.GetComponent<Image>();
 						image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
+						players[i].selectedCardsArray.Add(j);
 					}
 				}
 			} 
@@ -405,6 +418,7 @@ public class GameManager : MonoBehaviour
 			GamePlayer player = new GamePlayer();
 			player.name = StartDlg_NameinputLayout.transform.GetChild(i).transform.Find("InputField").gameObject.GetComponent<InputField>().text;
 			player.cardsArray = RandomCardsNumGet();
+			player.selectedCardsArray = new List<int>();
 			player.index = i;
 			players.Add(player);
 		}
@@ -434,16 +448,6 @@ public class GameManager : MonoBehaviour
 
 	public void GameStartClickHandler()
 	{
-		// int childcount = StartDlg_NameinputLayout.transform.childCount;
-		// players = new List<GamePlayer>();
-		// for (int i = 0; i < childcount; i++){
-		// 	string playername = StartDlg_NameinputLayout.transform.GetChild(i).gameObject.transform.Find("InputField").GetComponent<InputField>().text;
-		// 	GamePlayer player = new GamePlayer();
-		// 	player.name = playername;
-		// 	player.cardsArray = RandomCardsNumGet();
-		// 	players.Add(player);
-		// }
-
 		StartDlg.SetActive(false);
 	}
 
@@ -456,9 +460,13 @@ public class GameManager : MonoBehaviour
 			selcards.Add(i);
 		}
 		
-		
+		int seed = 0;
 		for (var i = 0; i < allusercardscount; i++){
-			int random_value = (int)Random.Range(0, allcardscount - 1);
+			// System.Threading.Thread.Sleep(1);
+			
+			seed += (int)System.DateTime.Now.Ticks.GetHashCode() + i;
+			System.Random rnd = new System.Random(seed );
+    		int random_value = rnd.Next(allcardscount);
 			allcardscount--;
 			cards.Add(selcards[random_value]);
 			selcards.RemoveAt(random_value);
@@ -475,7 +483,32 @@ public class GameManager : MonoBehaviour
 	}
 
 	public void cardsPanelButtonClickHandler(GameObject obj){
-		Debug.Log(obj.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text);
+		int idx = int.Parse(obj.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text);
+		var playerinfo = players[idx - 1];
+		OnePlayerCardsLayout.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = idx.ToString();
+		OnePlayerCardsLayout.transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.name;
+		
+		for (int i = 0; i < playerinfo.cardsArray.Count; i++){
+			int row = i / 6 + 1;
+			int col = i % 6 + 1;
+			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+		}
+
+		for (int i = 0 ; i < 36; i++){
+			int row = i / 6 + 1;
+			int col = i % 6 + 1;
+			// OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>().color.opaciy = playerinfo.cardsArray[i].ToString();
+			Image image1 =  OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 0f);
+		}
+
+		for (int i = 0 ; i < playerinfo.selectedCardsArray.Count; i++){
+			int row = playerinfo.selectedCardsArray[i] / 6 + 1;
+			int col = playerinfo.selectedCardsArray[i] % 6 + 1;
+			// OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>().color.opaciy = playerinfo.cardsArray[i].ToString();
+			Image image1 =  OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
+		}
 		OnePlayerCardsPanel.SetActive(true);
 	}
 
@@ -494,6 +527,36 @@ public class GameManager : MonoBehaviour
 		}
 		for (int i = 0 ; i < PlayerCardsLayout.transform.childCount; i++){
 			PlayerCardsLayout.transform.GetChild(i).transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].name;
+		}
+	}
+
+	public void BackgroundMusicOptionHandler(){
+		if (fxSound.isPlaying){
+			fxSound.Stop();
+		}
+		else fxSound.Play();
+	}
+
+	public void themeValueChangeHandler(){
+
+		
+		bg_ocean.SetActive(false);
+		bg_mermaid.SetActive(false);
+		bg_pearl.SetActive(false);
+		bg_sea.SetActive(false);
+		switch(themedropdown.gameObject.GetComponent<Dropdown>().value){
+			case 0:
+				bg_ocean.SetActive(true);
+				break;
+			case 1:
+				bg_mermaid.SetActive(true);
+				break;
+			case 2:
+				bg_pearl.SetActive(true);
+				break;
+			case 3:
+				bg_sea.SetActive(true);
+				break;
 		}
 	}
 

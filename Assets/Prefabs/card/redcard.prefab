@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.12745094, b: 0.5, a: 0}
+  m_Color: {r: 0.7294118, g: 0.10980392, b: 0.011764706, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -239,7 +239,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 51.85
+  m_fontSize: 53.65
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1

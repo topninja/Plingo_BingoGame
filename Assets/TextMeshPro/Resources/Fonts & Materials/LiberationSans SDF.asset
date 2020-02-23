@@ -25,16 +25,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _ColorMask: 15
-    - _FaceDilate: 0.336
+    - _FaceDilate: 0.66
     - _GradientScale: 10
     - _MaskSoftnessX: 0
     - _MaskSoftnessY: 0
     - _OutlineSoftness: 0.074
-    - _OutlineWidth: 0.34
+    - _OutlineWidth: 0.5
     - _PerspectiveFilter: 0.875
-    - _ScaleRatioA: 0.9
+    - _ScaleRatioA: 0.633134
     - _ScaleRatioB: 1
-    - _ScaleRatioC: 0.42885
+    - _ScaleRatioC: 0.13724999
     - _ScaleX: 1
     - _ScaleY: 1
     - _ShaderFlags: 0

@@ -166,7 +166,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 47.3
+  m_fontSize: 48.95
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -264,7 +264,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.10031758, y: 0.10300001}
   m_AnchorMax: {x: 0.8791942, y: 0.92100006}
-  m_AnchoredPosition: {x: 0.27999973, y: -0.10000038}
+  m_AnchoredPosition: {x: 0.2800007, y: -0.10000038}
   m_SizeDelta: {x: 1.0200005, y: 0.34999847}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6230952596447963988
@@ -288,7 +288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.12745094, b: 0.5, a: 0}
+  m_Color: {r: 0.7264151, g: 0.108959556, b: 0.01027944, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
