@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7294118, g: 0.10980392, b: 0.011764706, a: 0}
+  m_Color: {r: 0.84313726, g: 0.11764706, b: 0, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -180,10 +180,10 @@ RectTransform:
   m_Father: {fileID: 5729124924762174238}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.18234962, y: 0.17500001}
-  m_AnchorMax: {x: 0.8176993, y: 0.837}
-  m_AnchoredPosition: {x: 0.19249916, y: 0.069999695}
-  m_SizeDelta: {x: -0.385, y: -0.01}
+  m_AnchorMin: {x: 0.12142873, y: 0.163}
+  m_AnchorMax: {x: 0.8791942, y: 0.837}
+  m_AnchoredPosition: {x: -0.2800007, y: 0.5699997}
+  m_SizeDelta: {x: -0.5300002, y: -1.01}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5729124925348017106
 CanvasRenderer:
@@ -239,10 +239,10 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 51.05
-  m_fontSizeBase: 40
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0

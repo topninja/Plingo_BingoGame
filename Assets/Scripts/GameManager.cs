@@ -74,6 +74,14 @@ public class GameManager : MonoBehaviour
 	public GameObject OnePlayerCardsPanel;
 	public GameObject OnePlayerCardsLayout;
 
+	private List<selectedWiner> selectedWinners;
+
+	private bool gamestartstatus = false;
+
+	//winner show
+
+	public GameObject ShowWinnerPanel;
+
 
 
     // Start is called before the first frame update
@@ -113,6 +121,7 @@ public class GameManager : MonoBehaviour
 			blackcardobj.transform.SetParent(CardsLayout.transform, false);
 			cardIndex++;
 		}
+		
 		for (int i = 0; i < 16; i++){
 			GameObject bluecardobj = Instantiate(bluecard) as GameObject;
 			
@@ -218,6 +227,7 @@ public class GameManager : MonoBehaviour
 		{
 			GameObject.DestroyImmediate(PlayerCardsLayout.transform.GetChild(i).gameObject);
 		}
+		selectedWinners = new List<selectedWiner>();
 		for (int i = 0; i < players.Count; i++){
 			GameObject playercardPrefab = Instantiate(PlayerCardPanelPrefab) as GameObject;
 			playercardPrefab.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = (i + 1).ToString();
@@ -233,15 +243,23 @@ public class GameManager : MonoBehaviour
 			btn.onClick.AddListener(() => {cardsPanelButtonClickHandler(playercardPrefab.gameObject); });
 			
 			playercardPrefab.transform.SetParent(PlayerCardsLayout.transform, false);
+			selectedWiner winner = new selectedWiner();
+			
+			winner.rowIdx = new List<int>();
+			winner.colIdx = new List<int>();
+			winner.leftdiagonal = false;
+			winner.rightdiagonal = false;
+
+			selectedWinners.Add(winner);
 		}
-
-
+		StartDlg_PlayerCountDropDownbox.gameObject.GetComponent<Dropdown>().value = 0;
+		gamestartstatus = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!loadingState && Input.GetKeyUp(KeyCode.Space))
+        if (!loadingState && gamestartstatus && Input.GetKeyUp(KeyCode.Space))
 	    {
     		loadingState = true;
     		// Debug.Log(ballleftCount);
@@ -258,6 +276,7 @@ public class GameManager : MonoBehaviour
 		 	Color c = image.color;
 		 	c.a = 255;
 		 	image.color = c;
+			CardPanel.transform.GetChild(RandomCardIndex).transform.Find("cardNum").gameObject.	GetComponent<TextMeshProUGUI>().outlineColor = Color.black;
 		 	string str_selectedObjectName = CardPanel.transform.GetChild(RandomCardIndex).transform.name;
 		 	string str_selectedColor = "";
 		 	switch (str_selectedObjectName){
@@ -361,15 +380,132 @@ public class GameManager : MonoBehaviour
 						int col = j % 6 ;
 						Image image1 =  PlayerCardsLayout.transform.GetChild(i).transform.Find("Cards").transform.GetChild(row).transform.GetChild(col).transform.Find("bg").gameObject.GetComponent<Image>();
 						image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
+
 						players[i].selectedCardsArray.Add(j);
 					}
 				}
 			} 
 			AudioSource effectmusic = GetComponent<AudioSource>();
 			effectmusic.Play(0);
+			checkPlayersCardsforWinner();
 			loadingState = false;
 	    }
     }
+
+	private void checkPlayersCardsforWinner(){
+		List<int> ids = new List<int>();
+		for (int i = 0; i < players.Count; i++){
+			if (players[i].selectedCardsArray.Count == 0) continue;
+			var selectedCardsArray = players[i].selectedCardsArray;
+			//check row
+			bool winstate = false;
+			for (int j = 0 ; j < 6; j++){
+				winstate = false;
+				for (int k = 0 ; k < 6 ; k++){
+					winstate = false;
+					for (int l = 0; l < selectedCardsArray.Count; l++){
+						if (selectedCardsArray[l] == j * 6 + k){
+							winstate = true;
+						}
+					}
+					if (!winstate) break;
+				}
+				// if (winstate) Debug.Log("winner" + " player :  " + (i + 1) + "  row : "  + (j + 1 ));
+				if (winstate) {
+					bool insertedState = false;
+					for (int k = 0; k < selectedWinners[i].rowIdx.Count; k++){
+						if (selectedWinners[i].rowIdx[k] == j){
+							insertedState = true;
+						}
+					}
+					if (!insertedState){
+						selectedWinners[i].rowIdx.Add(j);
+						//show to screen
+						ids.Add(i);
+						Debug.Log("winner" + " player :  " + (i + 1) + "  row : "  + (j + 1 ));
+					} 
+				}
+			}
+
+			//check col
+			winstate = false;
+			for (int j = 0 ; j < 6; j++){
+				winstate = false;
+				for (int k = 0 ; k < 6 ; k++){
+					winstate = false;
+					for (int l = 0; l < selectedCardsArray.Count; l++){
+						if (selectedCardsArray[l] == j  + k * 6){
+							winstate = true;
+						}
+					}
+					if (!winstate) break;
+				}
+				// if (winstate) Debug.Log("winner" + " player :  " + (i + 1) + "  row : "  + (j + 1 ));
+				if (winstate) {
+					bool insertedState = false;
+					for (int k = 0; k < selectedWinners[i].colIdx.Count; k++){
+						if (selectedWinners[i].colIdx[k] == j){
+							insertedState = true;
+						}
+					}
+					if (!insertedState){
+						selectedWinners[i].colIdx.Add(j);
+						//show to screen
+						ids.Add(i);
+						Debug.Log("winner" + " player :  " + (i + 1) + "  col : "  + (j + 1 ));
+					} 
+				}
+			}
+
+			//check left leftdiagonal
+			winstate = false;
+			for (int j = 0 ; j < 6; j++){
+				winstate = false;
+				for (int l = 0; l < selectedCardsArray.Count; l++){
+					if (selectedCardsArray[l] == j * 6 + j){
+						winstate = true;
+					}
+				}
+				if (!winstate) break;
+			}
+			if (winstate && selectedWinners[i].leftdiagonal == false) {
+				selectedWinners[i].leftdiagonal = true;
+				ids.Add(i);
+				Debug.Log("winner" + " player :  " + (i + 1) + "  leftdiagonal : true");
+			}
+
+			//check right right_diagonal
+			winstate = false;
+			for (int j = 0 ; j < 6; j++){
+				winstate = false;
+				for (int l = 0; l < selectedCardsArray.Count; l++){
+					if (selectedCardsArray[l] == j * 6 + (5 - j)){
+						winstate = true;
+					}
+				}
+				if (!winstate) break;
+			}
+			if (winstate && selectedWinners[i].rightdiagonal == false) {
+				selectedWinners[i].rightdiagonal = true;
+				ids.Add(i);
+				Debug.Log("winner" + " player :  " + (i + 1) + "  rightdiagonal : true");
+			}
+		}
+		ShowWinnerByUserIds(ids);
+	}
+
+
+	private void ShowWinnerByUserIds(List<int> _ids){
+		if (_ids.Count == 0){
+			ShowWinnerPanel.SetActive(false);
+			return;
+		} 
+		var playerinfo = players[_ids[0]];
+		ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = (playerinfo.index + 1) + "";
+		ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.name;
+
+		ShowWinnerPanel.SetActive(true);
+	}
 
     public void ClickExit()
 	{
@@ -428,6 +564,7 @@ public class GameManager : MonoBehaviour
 		{
 			GameObject.DestroyImmediate(PlayerCardsLayout.transform.GetChild(i).gameObject);
 		}
+		selectedWinners = new List<selectedWiner>();
 		for (int i = 0; i < players.Count; i++){
 			GameObject playercardPrefab = Instantiate(PlayerCardPanelPrefab) as GameObject;
 			playercardPrefab.transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = (i + 1).ToString();
@@ -443,12 +580,23 @@ public class GameManager : MonoBehaviour
 			btn.onClick.AddListener(() => {cardsPanelButtonClickHandler(playercardPrefab.gameObject); });
 			
 			playercardPrefab.transform.SetParent(PlayerCardsLayout.transform, false);
+			
+			selectedWiner winner = new selectedWiner();
+			
+			winner.rowIdx = new List<int>();
+			winner.colIdx = new List<int>();
+			winner.leftdiagonal = false;
+			winner.rightdiagonal = false;
+
+			selectedWinners.Add(winner);
+
 		}
 	}
 
 	public void GameStartClickHandler()
 	{
 		StartDlg.SetActive(false);
+		gamestartstatus = true;
 	}
 
 	private List<int> RandomCardsNumGet(){
@@ -462,9 +610,9 @@ public class GameManager : MonoBehaviour
 		
 		int seed = 0;
 		for (var i = 0; i < allusercardscount; i++){
-			// System.Threading.Thread.Sleep(1);
-			
-			seed += (int)System.DateTime.Now.Ticks.GetHashCode() + i;
+			if ( i % 2 == 1)
+			System.Threading.Thread.Sleep(1);
+			seed = (int)System.DateTime.Now.Ticks.GetHashCode() + i * 100;
 			System.Random rnd = new System.Random(seed );
     		int random_value = rnd.Next(allcardscount);
 			allcardscount--;
