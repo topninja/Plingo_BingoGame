@@ -82,6 +82,15 @@ public class GameManager : MonoBehaviour
 
 	public GameObject ShowWinnerPanel;
 
+	private int winnerShowCount = 0;
+	private bool blackoutWinerShowState = false;
+
+	public bool winnershowstate;
+
+	private List<int> showWinnerIds;
+
+	private bool animationplaying;
+
 
 
     // Start is called before the first frame update
@@ -254,12 +263,25 @@ public class GameManager : MonoBehaviour
 		}
 		StartDlg_PlayerCountDropDownbox.gameObject.GetComponent<Dropdown>().value = 0;
 		gamestartstatus = false;
+		winnerShowCount = 0;
+		blackoutWinerShowState = false;
+		winnershowstate = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!loadingState && gamestartstatus && Input.GetKeyUp(KeyCode.Space))
+		if (!animationplaying && winnershowstate && Input.GetKeyUp(KeyCode.Space)){
+			if (showWinnerIds.Count > 0){
+				ShowWinnerByUserIds();
+			}
+			else {
+				ShowWinnerPanel.SetActive(false);
+				gamestartstatus = true;
+				winnershowstate = false;
+			}
+		}
+        else if (!loadingState && gamestartstatus && Input.GetKeyUp(KeyCode.Space))
 	    {
     		loadingState = true;
     		// Debug.Log(ballleftCount);
@@ -276,8 +298,9 @@ public class GameManager : MonoBehaviour
 		 	Color c = image.color;
 		 	c.a = 255;
 		 	image.color = c;
-			CardPanel.transform.GetChild(RandomCardIndex).transform.Find("cardNum").gameObject.	GetComponent<TextMeshProUGUI>().outlineColor = Color.black;
-		 	string str_selectedObjectName = CardPanel.transform.GetChild(RandomCardIndex).transform.name;
+			// CardPanel.transform.GetChild(RandomCardIndex).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().fontSharedMaterial.SetColor(ShaderUtilities.ID_OutlineColor, Color.black); ;
+			 
+			string str_selectedObjectName = CardPanel.transform.GetChild(RandomCardIndex).transform.name;
 		 	string str_selectedColor = "";
 		 	switch (str_selectedObjectName){
 		 		case "blackcard(Clone)":
@@ -393,7 +416,8 @@ public class GameManager : MonoBehaviour
     }
 
 	private void checkPlayersCardsforWinner(){
-		List<int> ids = new List<int>();
+		
+		showWinnerIds = new List<int>();
 		for (int i = 0; i < players.Count; i++){
 			if (players[i].selectedCardsArray.Count == 0) continue;
 			var selectedCardsArray = players[i].selectedCardsArray;
@@ -418,10 +442,11 @@ public class GameManager : MonoBehaviour
 							insertedState = true;
 						}
 					}
-					if (!insertedState){
+					if (!insertedState && winnerShowCount < 3){
 						selectedWinners[i].rowIdx.Add(j);
 						//show to screen
-						ids.Add(i);
+						showWinnerIds.Add(i);
+						winnerShowCount++;
 						Debug.Log("winner" + " player :  " + (i + 1) + "  row : "  + (j + 1 ));
 					} 
 				}
@@ -448,10 +473,11 @@ public class GameManager : MonoBehaviour
 							insertedState = true;
 						}
 					}
-					if (!insertedState){
+					if (!insertedState && winnerShowCount < 3){
 						selectedWinners[i].colIdx.Add(j);
 						//show to screen
-						ids.Add(i);
+						showWinnerIds.Add(i);
+						winnerShowCount++;
 						Debug.Log("winner" + " player :  " + (i + 1) + "  col : "  + (j + 1 ));
 					} 
 				}
@@ -468,9 +494,10 @@ public class GameManager : MonoBehaviour
 				}
 				if (!winstate) break;
 			}
-			if (winstate && selectedWinners[i].leftdiagonal == false) {
+			if (winstate && selectedWinners[i].leftdiagonal == false && winnerShowCount < 3) {
 				selectedWinners[i].leftdiagonal = true;
-				ids.Add(i);
+				showWinnerIds.Add(i);
+				winnerShowCount++;
 				Debug.Log("winner" + " player :  " + (i + 1) + "  leftdiagonal : true");
 			}
 
@@ -485,26 +512,79 @@ public class GameManager : MonoBehaviour
 				}
 				if (!winstate) break;
 			}
-			if (winstate && selectedWinners[i].rightdiagonal == false) {
+			if (winstate && selectedWinners[i].rightdiagonal == false && winnerShowCount < 3) {
 				selectedWinners[i].rightdiagonal = true;
-				ids.Add(i);
+				showWinnerIds.Add(i);
+				winnerShowCount++;
 				Debug.Log("winner" + " player :  " + (i + 1) + "  rightdiagonal : true");
 			}
+
+			//check blackout
+			winstate = false;
+			for (int j = 0 ; j < 36; j++){
+				winstate = false;
+				for (int l = 0; l < selectedCardsArray.Count; l++){
+					if (selectedCardsArray[l] == j ){
+						winstate = true;
+					}
+				}
+				if (!winstate) break;
+			}
+			if (winstate && !blackoutWinerShowState ) {
+				blackoutWinerShowState = true;
+				showWinnerIds.Add(i);
+				Debug.Log("blackout winner" + " player :  " + (i + 1) + "  blackout : true");
+			}
+
 		}
-		ShowWinnerByUserIds(ids);
+		
+		ShowWinnerByUserIds();
 	}
 
 
-	private void ShowWinnerByUserIds(List<int> _ids){
-		if (_ids.Count == 0){
+	public void ShowWinnerByUserIds(){
+		gamestartstatus = false;
+		if (showWinnerIds.Count == 0){
 			ShowWinnerPanel.SetActive(false);
+			gamestartstatus = true;
 			return;
-		} 
-		var playerinfo = players[_ids[0]];
+		}
+
+		var playerinfo = players[showWinnerIds[0]];
 		ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("no").gameObject.GetComponent<TextMeshProUGUI>().text = (playerinfo.index + 1) + "";
 		ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("username").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.name;
+		for (int i = 0; i < playerinfo.cardsArray.Count; i++){
+			int row = i / 6 + 1;
+			int col = i % 6 + 1;
+			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+		}
 
+		for (int i = 0 ; i < 36; i++){
+			int row = i / 6 + 1;
+			int col = i % 6 + 1;
+			Image image1 =  ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 0f);
+		}
+
+		for (int i = 0 ; i < playerinfo.selectedCardsArray.Count; i++){
+			int row = playerinfo.selectedCardsArray[i] / 6 + 1;
+			int col = playerinfo.selectedCardsArray[i] % 6 + 1;
+			Image image1 =  ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
+		}
+		showWinnerIds.RemoveAt(0);
 		ShowWinnerPanel.SetActive(true);
+		winnershowstate = true;
+		ShowWinnerPanel.gameObject.GetComponent<Animation>().Stop();
+		ShowWinnerPanel.gameObject.GetComponent<Animation>().Play("Winneraim");
+		animationplaying = true;
+		IEnumerator coroutine = WaitUntilAnimationFinish(2.0f);
+		StartCoroutine(coroutine);
+	}
+
+	private IEnumerator WaitUntilAnimationFinish(float waittime){
+		yield return new WaitForSeconds(waittime);
+		animationplaying = false;
 	}
 
     public void ClickExit()
@@ -624,9 +704,9 @@ public class GameManager : MonoBehaviour
 
 	public void showCardsPanel(){
 		
-		for(int i = 0; i < players.Count; i++){
+		// for(int i = 0; i < players.Count; i++){
 
-		}
+		// }
 		CardsPanel.SetActive(true);
 	}
 
