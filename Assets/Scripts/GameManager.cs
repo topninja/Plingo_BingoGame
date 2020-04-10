@@ -298,9 +298,14 @@ public class GameManager : MonoBehaviour
 		 	Color c = image.color;
 		 	c.a = 255;
 		 	image.color = c;
+			CardPanel.transform.GetChild(RandomCardIndex).transform.Find("cardNum").gameObject.SetActive(false);
+			CardPanel.transform.GetChild(RandomCardIndex).transform.Find("selectedCardNum").gameObject.SetActive(true);
+			CardPanel.transform.GetChild(RandomCardIndex).transform.Find("selectedCardNum").gameObject.GetComponent<TextMeshProUGUI>().text = CardPanel.transform.GetChild(RandomCardIndex).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text;
+			
 			// CardPanel.transform.GetChild(RandomCardIndex).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().fontSharedMaterial.SetColor(ShaderUtilities.ID_OutlineColor, Color.black); ;
 			 
 			string str_selectedObjectName = CardPanel.transform.GetChild(RandomCardIndex).transform.name;
+			Debug.Log(str_selectedObjectName);
 		 	string str_selectedColor = "";
 		 	switch (str_selectedObjectName){
 		 		case "blackcard(Clone)":
@@ -402,6 +407,8 @@ public class GameManager : MonoBehaviour
 						int row = j / 6 + 1;
 						int col = j % 6 ;
 						Image image1 =  PlayerCardsLayout.transform.GetChild(i).transform.Find("Cards").transform.GetChild(row).transform.GetChild(col).transform.Find("bg").gameObject.GetComponent<Image>();
+						PlayerCardsLayout.transform.GetChild(i).transform.Find("Cards").transform.GetChild(row).transform.GetChild(col).transform.Find("selectedCardNum").gameObject.SetActive(true);
+						PlayerCardsLayout.transform.GetChild(i).transform.Find("Cards").transform.GetChild(row).transform.GetChild(col).transform.Find("cardNum").gameObject.SetActive(false);
 						image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
 
 						players[i].selectedCardsArray.Add(j);
@@ -557,12 +564,17 @@ public class GameManager : MonoBehaviour
 			int row = i / 6 + 1;
 			int col = i % 6 + 1;
 			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("selectedCardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+			// ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+			
 		}
 
 		for (int i = 0 ; i < 36; i++){
 			int row = i / 6 + 1;
 			int col = i % 6 + 1;
 			Image image1 =  ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.SetActive(true);
+			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("selectedCardNum").gameObject.SetActive(false);
 			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 0f);
 		}
 
@@ -570,6 +582,9 @@ public class GameManager : MonoBehaviour
 			int row = playerinfo.selectedCardsArray[i] / 6 + 1;
 			int col = playerinfo.selectedCardsArray[i] % 6 + 1;
 			Image image1 =  ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.SetActive(false);
+			ShowWinnerPanel.transform.Find("WinnerCards").transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("selectedCardNum").gameObject.SetActive(true);
+
 			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
 		}
 		showWinnerIds.RemoveAt(0);
@@ -652,6 +667,8 @@ public class GameManager : MonoBehaviour
 			for (int j = 1; j < 7; j++){
 				for (int k = 0; k < 6; k++){
 					playercardPrefab.transform.Find("Cards").transform.GetChild(j).transform.GetChild(k).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].cardsArray[( j - 1 ) * 6 + k ].ToString();
+					playercardPrefab.transform.Find("Cards").transform.GetChild(j).transform.GetChild(k).transform.Find("selectedCardNum").gameObject.GetComponent<TextMeshProUGUI>().text = players[i].cardsArray[( j - 1 ) * 6 + k ].ToString();
+					
 					// Debug.Log(players[i].cardsArray[( j - 1 ) * 6 + k ].ToString());
 				}
 				
@@ -680,11 +697,11 @@ public class GameManager : MonoBehaviour
 	}
 
 	private List<int> RandomCardsNumGet(){
-		int allcardscount = 96;
+		int allcardscount = 95;
 		int allusercardscount = 36;
 		List<int> cards = new List<int>();
 		List<int> selcards = new List<int>();
-		for (int i = 1 ; i < allcardscount + 1; i++){
+		for (int i = 0 ; i < allcardscount + 1; i++){
 			selcards.Add(i);
 		}
 		
@@ -720,6 +737,8 @@ public class GameManager : MonoBehaviour
 			int row = i / 6 + 1;
 			int col = i % 6 + 1;
 			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("selectedCardNum").gameObject.GetComponent<TextMeshProUGUI>().text = playerinfo.cardsArray[i].ToString();
+			
 		}
 
 		for (int i = 0 ; i < 36; i++){
@@ -728,6 +747,8 @@ public class GameManager : MonoBehaviour
 			// OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>().color.opaciy = playerinfo.cardsArray[i].ToString();
 			Image image1 =  OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
 			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 0f);
+			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.SetActive(true);
+			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("selectedCardNum").gameObject.SetActive(false);
 		}
 
 		for (int i = 0 ; i < playerinfo.selectedCardsArray.Count; i++){
@@ -735,6 +756,8 @@ public class GameManager : MonoBehaviour
 			int col = playerinfo.selectedCardsArray[i] % 6 + 1;
 			// OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>().color.opaciy = playerinfo.cardsArray[i].ToString();
 			Image image1 =  OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("bg").gameObject.GetComponent<Image>();
+			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("cardNum").gameObject.SetActive(false);
+			OnePlayerCardsLayout.transform.Find("Cards").transform.Find(row.ToString()).transform.Find(col.ToString()).transform.Find("selectedCardNum").gameObject.SetActive(true);
 			image1.color = new Color(image1.color.r, image1.color.g, image1.color.b, 1f);
 		}
 		OnePlayerCardsPanel.SetActive(true);

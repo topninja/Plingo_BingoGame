@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8811130770250337157
+--- !u!1 &5562990561663142869
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,11 +8,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8811130770250337154}
-  - component: {fileID: 8811130770250337214}
-  - component: {fileID: 8811130770250337153}
-  - component: {fileID: 8811130770250337152}
-  - component: {fileID: 8811130770250337155}
+  - component: {fileID: 5562990561663142866}
+  - component: {fileID: 5562990561663142894}
+  - component: {fileID: 5562990561663142865}
+  - component: {fileID: 5562990561663142864}
+  - component: {fileID: 5562990561663142867}
   m_Layer: 5
   m_Name: StretchedBillboards
   m_TagString: Untagged
@@ -20,13 +20,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &8811130770250337154
+--- !u!224 &5562990561663142866
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8811130770250337157}
+  m_GameObject: {fileID: 5562990561663142869}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -39,13 +39,13 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!198 &8811130770250337214
+--- !u!198 &5562990561663142894
 ParticleSystem:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8811130770250337157}
+  m_GameObject: {fileID: 5562990561663142869}
   serializedVersion: 6
   lengthInSec: 5
   simulationSpeed: 1
@@ -4706,14 +4706,14 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!199 &8811130770250337153
+--- !u!199 &5562990561663142865
 ParticleSystemRenderer:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8811130770250337157}
+  m_GameObject: {fileID: 5562990561663142869}
   m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -4769,21 +4769,21 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
---- !u!222 &8811130770250337152
+--- !u!222 &5562990561663142864
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8811130770250337157}
+  m_GameObject: {fileID: 5562990561663142869}
   m_CullTransparentMesh: 0
---- !u!114 &8811130770250337155
+--- !u!114 &5562990561663142867
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8811130770250337157}
+  m_GameObject: {fileID: 5562990561663142869}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20e8969313b8e4614b498f042e99683a, type: 3}
@@ -4795,7 +4795,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_ParticleSystem: {fileID: 8811130770250337214}
+  m_ParticleSystem: {fileID: 5562990561663142894}
   m_RenderMode: 1
   m_StretchedSpeedScale: 1
   m_StretchedLenghScale: 1
